@@ -6,17 +6,19 @@ using UnityEngine;
 public class InputManager : MonoBehaviour {
 
     private GameObject[] bodyPartsClicked;
+    private GameObject[] lineRenderers;
     private Vector3[] clickLocations;
     private LineRenderer line;
     //Vector3 currentMousePos;
     public float forceMultiplier =1;
-    public LineRenderer line0, line1;
+    public GameObject linePrefab;
 
     // Use this for initialization
     void Start () {
         //line = gameObject.GetComponent<LineRenderer>();
-        clickLocations = new Vector3[4];
-        bodyPartsClicked = new GameObject[4];
+        clickLocations = new Vector3[10];
+        bodyPartsClicked = new GameObject[10];
+        lineRenderers = new GameObject[10];
     }
 	
 	// Update is called once per frame
@@ -24,67 +26,56 @@ public class InputManager : MonoBehaviour {
     {
         foreach (Touch touch in Input.touches)
         {
-            if (Input.touchCount > 0)
+            if (Input.touchCount > 0 && Input.touchCount<10)
             {
-                if (Input.touches[touch.fingerId].phase == TouchPhase.Began)
+                if (touch.phase == TouchPhase.Began)
                 {
-                    Debug.Log(touch.fingerId);
+                    Debug.Log("begin " + touch.fingerId);
 
-                    Vector3 clickLocation = Camera.main.ScreenToWorldPoint(Input.touches[touch.fingerId].position);
+                    Vector3 clickLocation = Camera.main.ScreenToWorldPoint(touch.position);
                     clickLocation = new Vector3(clickLocation.x, clickLocation.y, 0);
                     clickLocations[touch.fingerId] = clickLocation;
 
-                    if (touch.fingerId==0)
-                    {
-                        line0.enabled = true;
-                    }
-                    else if (touch.fingerId == 1)
-                    {
-                        line1.enabled = true;
-                    }
+                    lineRenderers[touch.fingerId] = Instantiate(linePrefab,new Vector3(0,0,0),Quaternion.identity);
                     
                     //Debug.Log("click");
-                    RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.touches[touch.fingerId].position), Vector2.zero);
+                    RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(touch.position), Vector2.zero);
                     if (hit.collider != null)
                     {
+                        //Debug.Log(touch.fingerId);
                         //Debug.Log(hit.transform.gameObject.name);
                         bodyPartsClicked[touch.fingerId] = hit.transform.gameObject;
                     }
                 }
-                else if (Input.touches[touch.fingerId].phase == TouchPhase.Moved)
+                else if (touch.phase == TouchPhase.Moved)
                 {
                     if (clickLocations[touch.fingerId] != null)
                     {
-                        Vector3 currentMousePos = new Vector3(Camera.main.ScreenToWorldPoint(Input.touches[touch.fingerId].position).x, Camera.main.ScreenToWorldPoint(Input.touches[touch.fingerId].position).y, 0);
-                        if (touch.fingerId == 0)
-                        {
-                            line0.SetPosition(0, clickLocations[touch.fingerId]);
-                            line0.SetPosition(1, currentMousePos);
-                        }
-                        else if (touch.fingerId == 1)
-                        {
-                            line1.SetPosition(0, clickLocations[touch.fingerId]);
-                            line1.SetPosition(1, currentMousePos);
-                        }
+                        Vector3 currentMousePos = new Vector3(Camera.main.ScreenToWorldPoint(touch.position).x, Camera.main.ScreenToWorldPoint(touch.position).y, 0);
+                        
+                        lineRenderers[touch.fingerId].GetComponent<LineRenderer>().SetPosition(0, clickLocations[touch.fingerId]);
+                        lineRenderers[touch.fingerId].GetComponent<LineRenderer>().SetPosition(1, currentMousePos);
+                        
                     }
                 }
 
-                else if (Input.touches[touch.fingerId].phase == TouchPhase.Ended)
+                else if (touch.phase == TouchPhase.Ended)
                 {
-                    Vector3 currentMousePos = new Vector3(Camera.main.ScreenToWorldPoint(Input.touches[touch.fingerId].position).x, Camera.main.ScreenToWorldPoint(Input.touches[touch.fingerId].position).y, 0);
-                    if (touch.fingerId == 0)
+                    Debug.Log("remove " + touch.fingerId);
+                    Vector3 currentMousePos = new Vector3(Camera.main.ScreenToWorldPoint(touch.position).x, Camera.main.ScreenToWorldPoint(touch.position).y, 0);
+                    foreach(Touch target in Input.touches)
                     {
-                        line0.enabled = false;
+                        if (target.fingerId == touch.fingerId)
+                        {
+                            Destroy(lineRenderers[touch.fingerId]);
+                        }
                     }
-                    else if (touch.fingerId == 1)
-                    {
-                        line1.enabled = false;
-                    }
+                    
 
                     if (bodyPartsClicked[touch.fingerId] != null)
                     {
                         bodyPartsClicked[touch.fingerId].GetComponent<Rigidbody2D>().AddForceAtPosition((clickLocations[touch.fingerId] - currentMousePos) * forceMultiplier, clickLocations[touch.fingerId]);
-                        bodyPartsClicked = null;
+                        //bodyPartsClicked = null;
                     }
                     //clickLocations[touch.fingerId] = Vector3.zero;
                     //bodyPartsClicked[touch.fingerId] = null;
