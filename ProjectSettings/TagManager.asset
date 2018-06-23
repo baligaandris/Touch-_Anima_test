@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Portal
   - Head
+  - matchmanager
   layers:
   - Default
   - TransparentFX
