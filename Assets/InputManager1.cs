@@ -15,6 +15,17 @@ public class InputManager1 : MonoBehaviour {
     public float forceMultiplier =1;
     public GameObject linePrefab;
 
+    //Input
+    public class Pointer
+    {
+        public float x;
+        public float y;
+        public enum Phase {Start, Hold, Release}
+        public Phase phase;
+        public int id;
+    }
+    Pointer pointer;
+
     // Use this for initialization
     void Start () {
         //line = gameObject.GetComponent<LineRenderer>();
@@ -42,6 +53,35 @@ public class InputManager1 : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            //Debug.Log("running in editor");
+            pointer.x = Input.mousePosition.x;
+            pointer.y = Input.mousePosition.y;
+            pointer.id = 0;
+            if (Input.GetMouseButtonDown(0))
+            {
+                pointer.phase = Pointer.Phase.Start;
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                pointer.phase = Pointer.Phase.Release;
+            }
+            else if (Input.GetMouseButton(0))
+            {
+                pointer.phase = Pointer.Phase.Hold;
+            }
+        }
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (Input.touchCount > 0)
+            {
+
+            }
+
+        }
+
+
         foreach (Touch touch in Input.touches)
         {
             if (Input.touchCount > 0 && Input.touchCount<10)
