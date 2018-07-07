@@ -77,12 +77,17 @@ public class InputManager2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Time.timeScale != 0)
+        if (Input.GetButtonDown("Jump"))
+        {
+            ResetTimeSpeed();
+        }
+        if (Time.timeScale != 0.01f)
         {
             timeMoving += Time.deltaTime;
             if (timeMoving >= 0.5f)
             {
-                Time.timeScale = 0;
+                Time.timeScale = 0.01f;
+                Time.fixedDeltaTime = 0.02F * Time.timeScale;
                 timeMoving = 0;
             }
         }
@@ -181,13 +186,43 @@ public class InputManager2 : MonoBehaviour
 
                 if (pointer.swiped == false)
                 {
-                    selectedBodyParts.Add(bodyPartsClicked[pointer.id]);
+                    bool alreadyselected = false;
+
+
+                    for (int i = selectedBodyParts.Count - 1; i >= 0; i--)
+                    {
+                        if (selectedBodyParts[i] == bodyPartsClicked[pointer.id])
+                        {
+                            selectedBodyParts.Remove(selectedBodyParts[i]);
+                            if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
+                            {
+                                bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.white;
+                            }
+                            alreadyselected = true;
+                        }
+                    }
+
+                    if (alreadyselected == false)
+                    {
+                        selectedBodyParts.Add(bodyPartsClicked[pointer.id]);
+                        if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>()!= null)
+                        {
+                            bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.red;
+                        }
+                        
+                    }   
+                    
                 }
                 else
                 {
                     foreach (GameObject bodypart in selectedBodyParts)
                     {
                         newAction = new Action(bodypart, (pointer.initialPosition - pointer.position) * forceMultiplier);
+
+                        if (bodypart.GetComponent<SpriteRenderer>() != null)
+                        {
+                            bodypart.GetComponent<SpriteRenderer>().color = Color.white;
+                        }
 
                         Debug.Log(bodypart.name);
                         Debug.Log(((pointer.initialPosition - pointer.position) * forceMultiplier).ToString());
@@ -215,6 +250,7 @@ public class InputManager2 : MonoBehaviour
         {
             action.objectToEffect.GetComponent<Rigidbody2D>().AddForce(action.force);
         }
+
         actionsToExecute.Clear();
     }
 }
