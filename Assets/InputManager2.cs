@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 public class InputManager2 : MonoBehaviour
@@ -10,13 +11,18 @@ public class InputManager2 : MonoBehaviour
     private GameObject[] bodyPartsClicked;
     private GameObject[] lineRenderers;
     public List<GameObject> selectedBodyParts = new List<GameObject>();
-    public Rigidbody2D[] allBodyParts;
+    public Rigidbody2D[] P1BodyParts, P2BodyParts;
     private Vector3[] clickLocations;
     private LineRenderer line;
     public float forceMultiplier = 1;
     public GameObject linePrefab;
 
     private float timeMoving;
+
+    public enum GamePhases { Player1, Player2, Execute };
+    GamePhases gamePhase;
+    public Text gamePhaseText;
+
 
     //Input
     [System.Serializable]
@@ -53,23 +59,36 @@ public class InputManager2 : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        gamePhase = GamePhases.Execute;
         clickLocations = new Vector3[10];
         bodyPartsClicked = new GameObject[10];
         lineRenderers = new GameObject[10];
 
         //find all bodyparts
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        GameObject player2 = GameObject.FindGameObjectWithTag("Player2");
         List<Rigidbody2D> tempList = new List<Rigidbody2D>();
 
-        foreach (GameObject player in players)
+        foreach (Rigidbody2D rb in player.GetComponentsInChildren<Rigidbody2D>())
         {
-            foreach (Rigidbody2D rb in player.GetComponentsInChildren<Rigidbody2D>())
+            if (rb.gameObject.GetComponent<SpriteRenderer>() != null)
+            {
+                tempList.Add(rb);
+            }
+            
+        }
+
+        P1BodyParts = tempList.ToArray();
+
+        foreach (Rigidbody2D rb in player2.GetComponentsInChildren<Rigidbody2D>())
+        {
+            if (rb.gameObject.GetComponent<SpriteRenderer>() != null)
             {
                 tempList.Add(rb);
             }
         }
-        allBodyParts = tempList.ToArray();
 
+        P2BodyParts = tempList.ToArray();
 
 
     }
@@ -77,20 +96,7 @@ public class InputManager2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButtonDown("Jump"))
-        {
-            ResetTimeSpeed();
-        }
-        if (Time.timeScale != 0.01f)
-        {
-            timeMoving += Time.deltaTime;
-            if (timeMoving >= 0.5f)
-            {
-                Time.timeScale = 0.01f;
-                Time.fixedDeltaTime = 0.02F * Time.timeScale;
-                timeMoving = 0;
-            }
-        }
+        gamePhaseText.text = gamePhase.ToString();
 
         if (Application.platform == RuntimePlatform.WindowsEditor)
         {
@@ -141,101 +147,231 @@ public class InputManager2 : MonoBehaviour
 
         }
 
-        if (pointer.active)
+        if (gamePhase == GamePhases.Player1)
         {
-            if (pointer.phase == Pointer.Phase.Start)
+            if (pointer.active)
             {
-
-                Vector3 clickLocation = pointer.position;
-
-                pointer.initialPosition = clickLocation;
-                Rigidbody2D closest = allBodyParts[0];
-                foreach (Rigidbody2D rb in allBodyParts)
+                if (pointer.phase == Pointer.Phase.Start)
                 {
-                    if (Vector3.Distance(rb.transform.position, clickLocation) < Vector3.Distance(closest.transform.position, clickLocation))
+
+                    Vector3 clickLocation = pointer.position;
+
+                    pointer.initialPosition = clickLocation;
+                    Rigidbody2D closest = P1BodyParts[0];
+                    foreach (Rigidbody2D rb in P1BodyParts)
                     {
-                        closest = rb;
+                        if (Vector3.Distance(rb.transform.position, clickLocation) < Vector3.Distance(closest.transform.position, clickLocation))
+                        {
+                            closest = rb;
+                        }
+                    }
+                    clickLocation = closest.transform.position;
+                    clickLocations[pointer.id] = clickLocation;
+                    bodyPartsClicked[pointer.id] = closest.gameObject;
+                    lineRenderers[pointer.id] = Instantiate(linePrefab, new Vector3(0, 0, 0), Quaternion.identity);
+
+                }
+                if (pointer.phase == Pointer.Phase.Hold)
+                {
+                    if (clickLocations[pointer.id] != null)
+                    {
+                        clickLocations[pointer.id] = bodyPartsClicked[pointer.id].transform.position;
+                    }
+
+                    if ((pointer.position - pointer.initialPosition).magnitude > 0.1)
+                    {
+                        pointer.swiped = true;
                     }
                 }
-                clickLocation = closest.transform.position;
-                clickLocations[pointer.id] = clickLocation;
-                bodyPartsClicked[pointer.id] = closest.gameObject;
-                lineRenderers[pointer.id] = Instantiate(linePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-
-            }
-            if (pointer.phase == Pointer.Phase.Hold)
-            {
-                if (clickLocations[pointer.id] != null)
+                if (lineRenderers[pointer.id] != null)
                 {
-                    clickLocations[pointer.id] = bodyPartsClicked[pointer.id].transform.position;
+                    lineRenderers[pointer.id].GetComponent<LineRenderer>().SetPosition(0, pointer.initialPosition);
+                    lineRenderers[pointer.id].GetComponent<LineRenderer>().SetPosition(1, pointer.position);
                 }
 
-                if ((pointer.position - pointer.initialPosition).magnitude > 0.1)
+
+                if (pointer.phase == Pointer.Phase.Release)
                 {
-                    pointer.swiped = true;
-                }
-            }
-
-            lineRenderers[pointer.id].GetComponent<LineRenderer>().SetPosition(0, pointer.initialPosition);
-            lineRenderers[pointer.id].GetComponent<LineRenderer>().SetPosition(1, pointer.position);
-
-            if (pointer.phase == Pointer.Phase.Release)
-            {
-                pointer.active = false;
+                    pointer.active = false;
 
 
-                if (pointer.swiped == false)
-                {
-                    bool alreadyselected = false;
-
-
-                    for (int i = selectedBodyParts.Count - 1; i >= 0; i--)
+                    if (pointer.swiped == false)
                     {
-                        if (selectedBodyParts[i] == bodyPartsClicked[pointer.id])
+                        bool alreadyselected = false;
+
+
+                        for (int i = selectedBodyParts.Count - 1; i >= 0; i--)
                         {
-                            selectedBodyParts.Remove(selectedBodyParts[i]);
+                            if (selectedBodyParts[i] == bodyPartsClicked[pointer.id])
+                            {
+                                selectedBodyParts.Remove(selectedBodyParts[i]);
+                                if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
+                                {
+                                    bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.white;
+                                }
+                                alreadyselected = true;
+                            }
+                        }
+
+                        if (alreadyselected == false)
+                        {
+                            selectedBodyParts.Add(bodyPartsClicked[pointer.id]);
                             if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
                             {
-                                bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.white;
+                                bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.red;
                             }
-                            alreadyselected = true;
-                        }
-                    }
 
-                    if (alreadyselected == false)
-                    {
-                        selectedBodyParts.Add(bodyPartsClicked[pointer.id]);
-                        if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>()!= null)
-                        {
-                            bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.red;
                         }
-                        
-                    }   
-                    
+
+                    }
+                    else
+                    {
+                        foreach (GameObject bodypart in selectedBodyParts)
+                        {
+                            newAction = new Action(bodypart, (pointer.initialPosition - pointer.position) * forceMultiplier);
+
+                            if (bodypart.GetComponent<SpriteRenderer>() != null)
+                            {
+                                bodypart.GetComponent<SpriteRenderer>().color = Color.white;
+                            }
+
+                            Debug.Log(bodypart.name);
+                            Debug.Log(((pointer.initialPosition - pointer.position) * forceMultiplier).ToString());
+                            Debug.Log(newAction.objectToEffect.name);
+                            Debug.Log(newAction.force.ToString());
+                            actionsToExecute.Add(newAction);
+                        }
+                        selectedBodyParts.Clear();
+                        gamePhase = GamePhases.Player2;
+                    }
+                    Destroy(lineRenderers[pointer.id]);
+                    pointer.holdTime = 0;
+                    pointer.swiped = false;
                 }
-                else
+            }
+        }
+        else if (gamePhase == GamePhases.Player2)
+        {
+            if (pointer.active)
+            {
+                if (pointer.phase == Pointer.Phase.Start)
                 {
-                    foreach (GameObject bodypart in selectedBodyParts)
-                    {
-                        newAction = new Action(bodypart, (pointer.initialPosition - pointer.position) * forceMultiplier);
 
-                        if (bodypart.GetComponent<SpriteRenderer>() != null)
+                    Vector3 clickLocation = pointer.position;
+
+                    pointer.initialPosition = clickLocation;
+                    Rigidbody2D closest = P2BodyParts[0];
+                    foreach (Rigidbody2D rb in P2BodyParts)
+                    {
+                        if (Vector3.Distance(rb.transform.position, clickLocation) < Vector3.Distance(closest.transform.position, clickLocation))
                         {
-                            bodypart.GetComponent<SpriteRenderer>().color = Color.white;
+                            closest = rb;
+                        }
+                    }
+                    clickLocation = closest.transform.position;
+                    clickLocations[pointer.id] = clickLocation;
+                    bodyPartsClicked[pointer.id] = closest.gameObject;
+                    lineRenderers[pointer.id] = Instantiate(linePrefab, new Vector3(0, 0, 0), Quaternion.identity);
+
+                }
+                if (pointer.phase == Pointer.Phase.Hold)
+                {
+                    if (clickLocations[pointer.id] != null)
+                    {
+                        clickLocations[pointer.id] = bodyPartsClicked[pointer.id].transform.position;
+                    }
+
+                    if ((pointer.position - pointer.initialPosition).magnitude > 0.1)
+                    {
+                        pointer.swiped = true;
+                    }
+                }
+
+                if (lineRenderers[pointer.id] != null)
+                {
+                    lineRenderers[pointer.id].GetComponent<LineRenderer>().SetPosition(0, pointer.initialPosition);
+                    lineRenderers[pointer.id].GetComponent<LineRenderer>().SetPosition(1, pointer.position);
+                }
+
+                if (pointer.phase == Pointer.Phase.Release)
+                {
+                    pointer.active = false;
+
+
+                    if (pointer.swiped == false)
+                    {
+                        bool alreadyselected = false;
+
+
+                        for (int i = selectedBodyParts.Count - 1; i >= 0; i--)
+                        {
+                            if (selectedBodyParts[i] == bodyPartsClicked[pointer.id])
+                            {
+                                selectedBodyParts.Remove(selectedBodyParts[i]);
+                                if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
+                                {
+                                    bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.white;
+                                }
+                                alreadyselected = true;
+                            }
                         }
 
-                        Debug.Log(bodypart.name);
-                        Debug.Log(((pointer.initialPosition - pointer.position) * forceMultiplier).ToString());
-                        Debug.Log(newAction.objectToEffect.name);
-                        Debug.Log(newAction.force.ToString());
-                        actionsToExecute.Add(newAction);
-                    }
-                    selectedBodyParts.Clear();
-                }
-                Destroy(lineRenderers[pointer.id]);
-                pointer.holdTime = 0;
-                pointer.swiped = false;
+                        if (alreadyselected == false)
+                        {
+                            selectedBodyParts.Add(bodyPartsClicked[pointer.id]);
+                            if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
+                            {
+                                bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.red;
+                            }
 
+                        }
+
+                    }
+                    else
+                    {
+                        foreach (GameObject bodypart in selectedBodyParts)
+                        {
+                            newAction = new Action(bodypart, (pointer.initialPosition - pointer.position) * forceMultiplier);
+
+                            if (bodypart.GetComponent<SpriteRenderer>() != null)
+                            {
+                                bodypart.GetComponent<SpriteRenderer>().color = Color.white;
+                            }
+
+                            Debug.Log(bodypart.name);
+                            Debug.Log(((pointer.initialPosition - pointer.position) * forceMultiplier).ToString());
+                            Debug.Log(newAction.objectToEffect.name);
+                            Debug.Log(newAction.force.ToString());
+                            actionsToExecute.Add(newAction);
+                        }
+                        selectedBodyParts.Clear();
+                        gamePhase = GamePhases.Execute;
+                    }
+                    Destroy(lineRenderers[pointer.id]);
+                    pointer.holdTime = 0;
+                    pointer.swiped = false;
+
+                }
+            }
+        }
+        else if (gamePhase == GamePhases.Execute)
+        {
+            if (Input.GetButtonDown("Jump"))
+            {
+                ResetTimeSpeed();
+                gamePhase = GamePhases.Execute;
+            }
+
+            if (Time.timeScale != 0.01f)
+            {
+                timeMoving += Time.deltaTime;
+                if (timeMoving >= 0.5f)
+                {
+                    Time.timeScale = 0.01f;
+                    Time.fixedDeltaTime = 0.02F * Time.timeScale;
+                    timeMoving = 0;
+                    gamePhase = GamePhases.Player1;
+                }
             }
         }
 
