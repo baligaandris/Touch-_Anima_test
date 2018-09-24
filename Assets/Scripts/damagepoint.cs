@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class damagepoint : MonoBehaviour
 {
-
     matchmanager matchmanager;
 
     // Use this for initialization
@@ -13,17 +12,14 @@ public class damagepoint : MonoBehaviour
         matchmanager = GameObject.FindGameObjectWithTag("matchmanager").GetComponent<matchmanager>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    //Collision on this head
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.transform.root != gameObject.transform.root)
         {
             matchmanager.Incrementscore(collision.gameObject);
+            //Add force to indicate knockout blow
+
         }
 
 

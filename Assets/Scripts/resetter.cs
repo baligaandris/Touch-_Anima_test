@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class resetter : MonoBehaviour
 {
-
     private Vector3 pos;
     private Quaternion rot;
 
@@ -15,12 +14,7 @@ public class resetter : MonoBehaviour
         rot = transform.rotation;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    //Reset limb to position, roation from start of instance. Reset velocity to 0
     public void ResetTransform()
     {
         transform.position = pos;

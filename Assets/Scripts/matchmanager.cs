@@ -5,27 +5,12 @@ using UnityEngine.UI;
 
 public class matchmanager : MonoBehaviour
 {
-
     public int score1 = 0, score2 = 0;
     public GameObject player1, player2;
     public Text scoreText1, scoreText2;
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-
     public void Incrementscore(GameObject hitter)
     {
-
         if (hitter.transform.root.gameObject == player1)
         {
             score1++;
