@@ -10,6 +10,11 @@ public class resetter : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        InitialPositions();
+    }
+
+    void InitialPositions()
+    {
         pos = transform.position;
         rot = transform.rotation;
     }

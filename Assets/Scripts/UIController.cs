@@ -17,12 +17,18 @@ public class UIController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        //Get the advance button components
-        advanceBtn = GameObject.Find("Advance_Btn").GetComponent<Button>();
-        advanceTxt = advanceBtn.gameObject.transform.GetChild(0).GetComponent<Text>();
+        //Get UI objects and store in vars
+        GetUIObjects();
 
         //Set initial text for advanceBtn;
         ChangeTurn(1);
+    }
+
+    void GetUIObjects()
+    {
+        //Get the advance button components
+        advanceBtn = GameObject.Find("Advance_Btn").GetComponent<Button>();
+        advanceTxt = advanceBtn.gameObject.transform.GetChild(0).GetComponent<Text>();
     }
 
     //Change text depending on status

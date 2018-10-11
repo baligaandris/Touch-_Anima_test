@@ -9,6 +9,11 @@ public class damagepoint : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Initialize();
+    }
+
+    void Initialize()
+    {
         matchmanager = GameObject.FindGameObjectWithTag("matchmanager").GetComponent<matchmanager>();
     }
 
