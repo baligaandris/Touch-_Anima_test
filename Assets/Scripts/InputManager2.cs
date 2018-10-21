@@ -74,7 +74,7 @@ public class InputManager2 : MonoBehaviour
         //Get body part gameobjects
         GetPlayerParts();
 
-        canSelect = false;
+        canSelect = true;
     }
 
     // Update is called once per frame
@@ -129,7 +129,7 @@ public class InputManager2 : MonoBehaviour
 
         }
 
-        if (gamePhase == GamePhases.Player1 && !canSelect)
+        if (gamePhase == GamePhases.Player1 && canSelect)
         {
             if (pointer.active)
             {
@@ -247,7 +247,7 @@ public class InputManager2 : MonoBehaviour
                 }
             }
         }
-        else if (gamePhase == GamePhases.Player2 && !canSelect)
+        else if (gamePhase == GamePhases.Player2 && canSelect)
         {
             if (pointer.active)
             {
@@ -370,7 +370,6 @@ public class InputManager2 : MonoBehaviour
                     //reset the pointer to avoid rogue body selection on execute button click
                     pointer.Reset();
                     selectedBodyParts.Clear();
-                    canSelect = false;
                 }
             }
         }

@@ -5,22 +5,64 @@ using UnityEngine.UI;
 
 public class matchmanager : MonoBehaviour
 {
-    public int score1 = 0, score2 = 0;
+    private int livesP1 = 1, livesP2 = 3;
+    private InputManager2 inputManager;
     public GameObject player1, player2;
-    public Text scoreText1, scoreText2;
+    //To control UI
+    private UIController uiController;
+    [SerializeField]
+    [Header("Timers are divided by 100 to accomodate for time slow down")]
+    float resetTimer;
+    [SerializeField]
+    float endResetTimer;
+
+    private void Start()
+    {
+        //Get UI controller
+        uiController = transform.parent.GetChild(0).GetComponent<UIController>();
+        //Initial score display
+        uiController.UpdateText(livesP1, livesP2);
+        //Get input manager
+        inputManager = GameObject.Find("Input Manager").GetComponent<InputManager2>();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            StartReset();
+        }
+    }
 
     public void Incrementscore(GameObject hitter)
     {
         if (hitter.transform.root.gameObject == player1)
         {
-            score1++;
-            scoreText1.text = score1.ToString();
+            livesP2--;
         }
         else if (hitter.transform.root.gameObject == player2)
         {
-            score2++;
-            scoreText2.text = score2.ToString();
+            livesP1--;
         }
+        transform.parent.GetChild(0).GetComponent<UIController>().UpdateText(livesP1, livesP2);
+    }
+
+    public void StartReset()
+    {
+        if (livesP1 != 0 || livesP2 != 0)
+            StartCoroutine(ResetPositions(resetTimer));
+        else
+            ResetPositions(endResetTimer);
+    }
+
+    //Wait before reseting positions to show the blow of the hit
+    public IEnumerator ResetPositions(float resetTime)
+    {
+        print("CALLED");
+        //To accomodate for time slowing
+        resetTime = resetTimer / 100;
+        yield return new WaitForSeconds(resetTime);
+        //Reset the positions
         foreach (resetter res in player1.GetComponentsInChildren<resetter>())
         {
             res.ResetTransform();
@@ -29,5 +71,23 @@ public class matchmanager : MonoBehaviour
         {
             res.ResetTransform();
         }
+
+        //Reset hit after reset
+        GameObject[] damagePoints = GameObject.FindGameObjectsWithTag("Head");
+        foreach(GameObject g in damagePoints)
+        {
+            g.GetComponent<damagepoint>().ResetHit();
+        }
+
+        print("PASSED");
+        //If game is over, show UI
+        //Pass in the name of winner, depending on lives
+        if (livesP1 <= 0)
+            uiController.ShowWinnerText("Player 2");
+        else if (livesP2 <= 0)
+            uiController.ShowWinnerText("Player 1");
+        //If the game is still being played, allow selection again
+        else
+            inputManager.canSelect = true;
     }
 }
