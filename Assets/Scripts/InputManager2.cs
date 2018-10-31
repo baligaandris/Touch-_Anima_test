@@ -129,7 +129,7 @@ public class InputManager2 : MonoBehaviour
 
         }
 
-        if (gamePhase == GamePhases.Player1 && canSelect)
+        if (gamePhase != GamePhases.Execute && canSelect)
         {
             if (pointer.active)
             {
@@ -137,14 +137,34 @@ public class InputManager2 : MonoBehaviour
                 {
 
                     Vector3 clickLocation = pointer.position;
+                    Rigidbody2D[] bodyParts;
+
+                    if (gamePhase == GamePhases.Player1)
+                    {
+                        bodyParts = P1BodyParts;
+                    }
+                    else
+                    {
+                        bodyParts = P2BodyParts;
+                    }
 
                     pointer.initialPosition = clickLocation;
-                    Rigidbody2D closest = P1BodyParts[0];
-                    foreach (Rigidbody2D rb in P1BodyParts)
+                    Rigidbody2D closest = bodyParts[0];
+                    print(closest.gameObject.name);
+                    foreach (Rigidbody2D rb in bodyParts)
                     {
                         if (Vector3.Distance(rb.transform.position, clickLocation) < Vector3.Distance(closest.transform.position, clickLocation))
                         {
-                            closest = rb;
+                            //if this is a third level weak spot
+                            if (rb.gameObject.tag == "impactSpot")
+                            {
+                                //Check if this spot is disabled, if not, select it
+                                if (rb.gameObject.GetComponent<thirdLevelPoints>().disabled <= 0)
+                                    closest = rb;
+                            }
+                            //Not a third level weak spot
+                            else
+                                closest = rb;
                         }
                     }
                     //clickLocation = closest.transform.position;
@@ -195,6 +215,11 @@ public class InputManager2 : MonoBehaviour
                                 if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
                                 {
                                     bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.white;
+                                    //If third level weak spot
+                                    if(bodyPartsClicked[pointer.id].tag == "impactSpot")
+                                    {
+                                        bodyPartsClicked[pointer.id].GetComponent<thirdLevelPoints>().setSelected(false);
+                                    }
                                 }
                                 alreadyselected = true;
                             }
@@ -207,7 +232,12 @@ public class InputManager2 : MonoBehaviour
                             selectedBodyParts.Add(bodyPartsClicked[pointer.id]);
                             if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
                             {
-                                bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.red;
+                                bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.green;
+                                //If third level weak spot
+                                if (bodyPartsClicked[pointer.id].tag == "impactSpot")
+                                {
+                                    bodyPartsClicked[pointer.id].GetComponent<thirdLevelPoints>().setSelected(true);
+                                }
                             }
                         }
 
@@ -223,21 +253,36 @@ public class InputManager2 : MonoBehaviour
                             if (bodypart.GetComponent<SpriteRenderer>() != null)
                             {
                                 bodypart.GetComponent<SpriteRenderer>().color = Color.white;
+                                //If third level weak spot
+                                if (bodyPartsClicked[pointer.id].tag == "impactSpot")
+                                {
+                                    bodyPartsClicked[pointer.id].GetComponent<thirdLevelPoints>().setSelected(false);
+                                }
                             }
                             //Testing debug logs
-                            Debug.Log(bodypart.name);
-                            Debug.Log(((pointer.initialPosition - pointer.position) * forceMultiplier).ToString());
-                            Debug.Log(newAction.objectToEffect.name);
-                            Debug.Log(newAction.force.ToString());
+                            //Debug.Log(bodypart.name);
+                            //Debug.Log(((pointer.initialPosition - pointer.position) * forceMultiplier).ToString());
+                            //Debug.Log(newAction.objectToEffect.name);
+                            //Debug.Log(newAction.force.ToString());
                             //End
                             //Actions which are cycled through when executing the turn
                             actionsToExecute.Add(newAction);
                         }
-                        //Give turn to player 2
-                        gamePhase = GamePhases.Player2;
-                        GetComponent<UIController>().ChangeTurn(2);
+                        //Change phase
+                        if (gamePhase == GamePhases.Player1)
+                        {
+                            gamePhase = GamePhases.Player2;
+                            GetComponent<UIController>().ChangeTurn(2);
+                        }
+                        else
+                        {
+                            gamePhase = GamePhases.Execute;
+                            GetComponent<UIController>().ChangeTurn(3);
+                        }
                         //Clear the selected parts
                         selectedBodyParts.Clear();
+                        foreach (GameObject g in GameObject.FindGameObjectsWithTag("impactSpot"))
+                            g.GetComponent<thirdLevelPoints>().setSelected(false);
                     }
                     //Remove line renderer after release
                     Destroy(lineRenderers[pointer.id]);
@@ -247,112 +292,7 @@ public class InputManager2 : MonoBehaviour
                 }
             }
         }
-        else if (gamePhase == GamePhases.Player2 && canSelect)
-        {
-            if (pointer.active)
-            {
-                if (pointer.phase == Pointer.Phase.Start)
-                {
 
-                    Vector3 clickLocation = pointer.position;
-
-                    pointer.initialPosition = clickLocation;
-                    Rigidbody2D closest = P2BodyParts[0];
-                    foreach (Rigidbody2D rb in P2BodyParts)
-                    {
-                        if (Vector3.Distance(rb.transform.position, clickLocation) < Vector3.Distance(closest.transform.position, clickLocation))
-                        {
-                            closest = rb;
-                        }
-                    }
-                    clickLocation = closest.transform.position;
-                    clickLocations[pointer.id] = clickLocation;
-                    bodyPartsClicked[pointer.id] = closest.gameObject;
-                    lineRenderers[pointer.id] = Instantiate(linePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-
-                }
-                if (pointer.phase == Pointer.Phase.Hold)
-                {
-                    if (clickLocations[pointer.id] != null)
-                    {
-                        clickLocations[pointer.id] = bodyPartsClicked[pointer.id].transform.position;
-                    }
-
-                    if ((pointer.position - pointer.initialPosition).magnitude > 0.1)
-                    {
-                        pointer.swiped = true;
-                    }
-                }
-
-                if (lineRenderers[pointer.id] != null)
-                {
-                    lineRenderers[pointer.id].GetComponent<LineRenderer>().SetPosition(0, pointer.initialPosition);
-                    lineRenderers[pointer.id].GetComponent<LineRenderer>().SetPosition(1, pointer.position);
-                }
-
-                if (pointer.phase == Pointer.Phase.Release)
-                {
-                    pointer.active = false;
-
-
-                    if (pointer.swiped == false)
-                    {
-                        bool alreadyselected = false;
-
-
-                        for (int i = selectedBodyParts.Count - 1; i >= 0; i--)
-                        {
-                            if (selectedBodyParts[i] == bodyPartsClicked[pointer.id])
-                            {
-                                selectedBodyParts.Remove(selectedBodyParts[i]);
-                                if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
-                                {
-                                    bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.white;
-                                }
-                                alreadyselected = true;
-                            }
-                        }
-
-                        if (alreadyselected == false)
-                        {
-                            selectedBodyParts.Add(bodyPartsClicked[pointer.id]);
-                            if (bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>() != null)
-                            {
-                                bodyPartsClicked[pointer.id].GetComponent<SpriteRenderer>().color = Color.red;
-                            }
-
-                        }
-
-                    }
-                    else
-                    {
-                        foreach (GameObject bodypart in selectedBodyParts)
-                        {
-                            newAction = new Action(bodypart, (pointer.initialPosition - pointer.position) * forceMultiplier);
-
-                            if (bodypart.GetComponent<SpriteRenderer>() != null)
-                            {
-                                bodypart.GetComponent<SpriteRenderer>().color = Color.white;
-                            }
-
-                            Debug.Log(bodypart.name);
-                            Debug.Log(((pointer.initialPosition - pointer.position) * forceMultiplier).ToString());
-                            Debug.Log(newAction.objectToEffect.name);
-                            Debug.Log(newAction.force.ToString());
-                            actionsToExecute.Add(newAction);
-                        }
-                        
-                        gamePhase = GamePhases.Execute;
-                        GetComponent<UIController>().ChangeTurn(3);
-                        selectedBodyParts.Clear();
-                    }
-                    Destroy(lineRenderers[pointer.id]);
-                    pointer.holdTime = 0;
-                    pointer.swiped = false;
-
-                }
-            }
-        }
         //Execture phase
         else if (gamePhase == GamePhases.Execute)
         {
@@ -370,6 +310,14 @@ public class InputManager2 : MonoBehaviour
                     //reset the pointer to avoid rogue body selection on execute button click
                     pointer.Reset();
                     selectedBodyParts.Clear();
+
+                    //Reduce counter on disabled third level weak points
+                    foreach(GameObject g in GameObject.FindGameObjectsWithTag("impactSpot"))
+                    {
+                        thirdLevelPoints t = g.GetComponent<thirdLevelPoints>();
+                        if (t.disabled > 0)
+                            t.disabled--;
+                    }
                 }
             }
         }

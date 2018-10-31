@@ -1722,9 +1722,10 @@ GameObject:
   - component: {fileID: 382561632}
   - component: {fileID: 382561631}
   - component: {fileID: 382561630}
+  - component: {fileID: 382561636}
   m_Layer: 10
   m_Name: R Hand
-  m_TagString: Limb
+  m_TagString: impactSpot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1890,6 +1891,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &382561636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 382561628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842dd0009bdf06b4a81c3ef6f7a95357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabled: 0
 --- !u!1 &384624667 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1991616734410364, guid: 2b4ed7acf11ca9e4d809147a3f945fd4,
@@ -2027,9 +2040,10 @@ GameObject:
   - component: {fileID: 481386734}
   - component: {fileID: 481386733}
   - component: {fileID: 481386732}
+  - component: {fileID: 481386738}
   m_Layer: 11
   m_Name: L Hand
-  m_TagString: Limb
+  m_TagString: impactSpot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2195,6 +2209,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &481386738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 481386730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842dd0009bdf06b4a81c3ef6f7a95357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabled: 0
 --- !u!1 &483714580
 GameObject:
   m_ObjectHideFlags: 0
@@ -2248,7 +2274,7 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -2317,9 +2343,10 @@ GameObject:
   - component: {fileID: 497671640}
   - component: {fileID: 497671639}
   - component: {fileID: 497671638}
+  - component: {fileID: 497671644}
   m_Layer: 11
   m_Name: R Hand
-  m_TagString: Limb
+  m_TagString: impactSpot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2485,6 +2512,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &497671644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 497671636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842dd0009bdf06b4a81c3ef6f7a95357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabled: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3713,9 +3752,10 @@ GameObject:
   - component: {fileID: 842568825}
   - component: {fileID: 842568824}
   - component: {fileID: 842568823}
+  - component: {fileID: 842568829}
   m_Layer: 10
   m_Name: Foot
-  m_TagString: Limb
+  m_TagString: impactSpot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3879,6 +3919,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &842568829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 842568821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842dd0009bdf06b4a81c3ef6f7a95357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabled: 0
 --- !u!1 &885735909
 GameObject:
   m_ObjectHideFlags: 0
@@ -4690,7 +4742,7 @@ GameObject:
   - component: {fileID: 1214399039}
   m_Layer: 0
   m_Name: ground (2)
-  m_TagString: Untagged
+  m_TagString: bounds
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5059,9 +5111,10 @@ GameObject:
   - component: {fileID: 1258638743}
   - component: {fileID: 1258638742}
   - component: {fileID: 1258638741}
+  - component: {fileID: 1258638747}
   m_Layer: 10
   m_Name: Foot
-  m_TagString: Limb
+  m_TagString: impactSpot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5225,6 +5278,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1258638747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1258638739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842dd0009bdf06b4a81c3ef6f7a95357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabled: 0
 --- !u!1 &1310284572
 GameObject:
   m_ObjectHideFlags: 0
@@ -6060,9 +6125,10 @@ GameObject:
   - component: {fileID: 1484475280}
   - component: {fileID: 1484475279}
   - component: {fileID: 1484475278}
+  - component: {fileID: 1484475284}
   m_Layer: 11
   m_Name: Foot
-  m_TagString: Limb
+  m_TagString: impactSpot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6226,6 +6292,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1484475284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1484475276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842dd0009bdf06b4a81c3ef6f7a95357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabled: 0
 --- !u!1 &1496893153
 GameObject:
   m_ObjectHideFlags: 0
@@ -6241,7 +6319,7 @@ GameObject:
   - component: {fileID: 1496893157}
   m_Layer: 0
   m_Name: Head
-  m_TagString: Head
+  m_TagString: SpineP2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6279,7 +6357,7 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -6682,9 +6760,10 @@ GameObject:
   - component: {fileID: 1749024196}
   - component: {fileID: 1749024195}
   - component: {fileID: 1749024194}
+  - component: {fileID: 1749024200}
   m_Layer: 11
   m_Name: Foot
-  m_TagString: Limb
+  m_TagString: impactSpot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6848,6 +6927,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1749024200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1749024192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842dd0009bdf06b4a81c3ef6f7a95357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabled: 0
 --- !u!1 &1771151412
 GameObject:
   m_ObjectHideFlags: 0
@@ -7153,9 +7244,10 @@ GameObject:
   - component: {fileID: 1782139934}
   - component: {fileID: 1782139933}
   - component: {fileID: 1782139932}
+  - component: {fileID: 1782139938}
   m_Layer: 10
   m_Name: L Hand
-  m_TagString: Limb
+  m_TagString: impactSpot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7321,6 +7413,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1782139938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1782139930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842dd0009bdf06b4a81c3ef6f7a95357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disabled: 0
 --- !u!1 &1878831834
 GameObject:
   m_ObjectHideFlags: 0
@@ -7444,7 +7548,7 @@ GameObject:
   - component: {fileID: 1935759937}
   m_Layer: 0
   m_Name: ground (1)
-  m_TagString: Untagged
+  m_TagString: bounds
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8107,8 +8211,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player1: {fileID: 1959856948}
   player2: {fileID: 570674726}
-  resetTimer: 3
-  endResetTimer: 10
+  resetTimer: 5
+  endResetTimer: 5
+  wallCollisionDeath: 1
+  impactMinVelocityX: 5
+  impactMinVelocityY: 5
 --- !u!4 &2135716926
 Transform:
   m_ObjectHideFlags: 0

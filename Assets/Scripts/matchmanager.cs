@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class matchmanager : MonoBehaviour
 {
-    private int livesP1 = 1, livesP2 = 3;
+    private int livesP1 = 3, livesP2 = 3;
     private InputManager2 inputManager;
     public GameObject player1, player2;
     //To control UI
@@ -15,6 +15,21 @@ public class matchmanager : MonoBehaviour
     float resetTimer;
     [SerializeField]
     float endResetTimer;
+    [SerializeField]
+    [Header("Enable to cause death on wall collision")]
+    bool wallCollisionDeath;
+    //Getter for wall collision var
+    public bool deathOnWallCollision() { return wallCollisionDeath; }
+    //Impact limit velocity to disable a hand or foot
+    [Header("Used to check if the impact velocity is strong enough to disable a third level spot")]
+    [SerializeField]
+    float impactMinVelocityX;
+    //Getter
+    public float getMinVelocityX() { return impactMinVelocityX; }
+    [SerializeField]
+    float impactMinVelocityY;
+    //Gettter
+    public float getMinVelocityY() { return impactMinVelocityY; }
 
     private void Start()
     {
@@ -79,7 +94,6 @@ public class matchmanager : MonoBehaviour
             g.GetComponent<damagepoint>().ResetHit();
         }
 
-        print("PASSED");
         //If game is over, show UI
         //Pass in the name of winner, depending on lives
         if (livesP1 <= 0)

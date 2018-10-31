@@ -11,6 +11,8 @@ TagManager:
   - Limb
   - SpineP1
   - SpineP2
+  - bounds
+  - impactSpot
   layers:
   - Default
   - TransparentFX
